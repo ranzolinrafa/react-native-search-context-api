@@ -1,56 +1,37 @@
 import React from "react";
-import { StyleSheet, TouchableOpacity, Text } from "react-native";
-import { Card } from "react-native-paper";
+import { TextInput, StyleSheet } from "react-native";
 import { TasksContext } from "../contexts/TasksContext";
 
-export const Task = ({ ...props }) => {
-  const { task } = props;
-  const { tasks, setTasks } = React.useContext(TasksContext);
-  const [done, setDone] = React.useState(task.done);
-
-  const handlePress = (task) => {
-    setDone(!done);
-  };
+export const SearchInput = () => {
+  const { tasks, setFilteredTasks } = React.useContext(TasksContext);
+  const [value, setValue] = React.useState("");
 
   React.useEffect(() => {
-    setTasks(
-      tasks.map((item) => {
-        if (item.id === task.id) {
-          return {
-            ...item,
-            done,
-          };
-        } else return item;
-      })
-    );
-  }, [done]);
+    if (value.length === 0) setFilteredTasks(tasks);
+
+    let filter = tasks.filter((task, index) => {
+      return task.title.toLowerCase().includes(value.toLowerCase());
+    });
+
+    setFilteredTasks(filter);
+  }, [value]);
 
   return (
-    <TouchableOpacity onPress={() => handlePress(task)}>
-      <Card
-        style={[styles.task, done && styles.taskDone]}
-        onPress={() => handlePress(task)}
-      >
-        <Text style={[styles.taskText, done && styles.taskTextDone]}>
-          {task.title}
-        </Text>
-      </Card>
-    </TouchableOpacity>
+    <TextInput
+      onChangeText={setValue}
+      placeholder="Search Tasks..."
+      style={styles.searchInput}
+    />
   );
 };
 
 const styles = StyleSheet.create({
-  task: {
-    padding: 16,
-    marginBottom: 8,
-  },
-  taskDone: {
-    opacity: 0.5,
-  },
-  taskText: {
-    fontSize: 14,
-  },
-  taskTextDone: {
-    textDecorationLine: "line-through",
+  searchInput: {
+    background: "#ffffff",
+    borderColor: "red",
+    borderRadius: 4,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginBottom: 32,
   },
 });
